@@ -1,7 +1,7 @@
 ARG BASE_TAG=2019.03
 ARG TENSORFLOW_VERSION=2.1.0
 
-FROM gcr.io/kaggle-images/python-tensorflow-whl:${TENSORFLOW_VERSION}-py36 as tensorflow_whl
+FROM gcr.io/kaggle-images/python-tensorflow-whl:${TENSORFLOW_VERSION}-py37 as tensorflow_whl
 FROM continuumio/anaconda3:${BASE_TAG}
 
 ADD clean-layer.sh  /tmp/clean-layer.sh
@@ -205,7 +205,7 @@ RUN pip install mpld3 && \
     pip install path.py && \
     pip install Geohash && \
     # https://github.com/vinsci/geohash/issues/4
-    sed -i -- 's/geohash/.geohash/g' /opt/conda/lib/python3.6/site-packages/Geohash/__init__.py && \
+    sed -i -- 's/geohash/.geohash/g' /opt/conda/lib/python3.7/site-packages/Geohash/__init__.py && \
     pip install deap && \
     pip install tpot && \
     pip install scikit-optimize && \
@@ -498,12 +498,13 @@ RUN apt-get install tesseract-ocr -y && \
 ENV TESSERACT_PATH=/usr/bin/tesseract
 
 # Pin Vowpal Wabbit v8.6.0 because 8.6.1 does not build or install successfully
-RUN cd /usr/local/src && \
-    git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
-    ./vowpal_wabbit/python/conda_install.sh && \
-    # Reinstall in non-editable mode (without the -e flag)
-    pip install vowpal_wabbit/python && \
-    /tmp/clean-layer.sh
+# This installs python 3.6. Fix before releasing.
+# RUN cd /usr/local/src && \
+#     git clone -b 8.6.0 https://github.com/JohnLangford/vowpal_wabbit.git && \
+#     ./vowpal_wabbit/python/conda_install.sh && \
+#     # Reinstall in non-editable mode (without the -e flag)
+#     pip install vowpal_wabbit/python && \
+#     /tmp/clean-layer.sh
 
 # For Facets
 ENV PYTHONPATH=$PYTHONPATH:/opt/facets/facets_overview/python/
@@ -517,7 +518,7 @@ RUN pip install --upgrade dask && \
     mkdir -p /root/.jupyter && touch /root/.jupyter/jupyter_nbconvert_config.py && touch /root/.jupyter/migrated && \
     mkdir -p /.jupyter && touch /.jupyter/jupyter_nbconvert_config.py && touch /.jupyter/migrated && \
     # Stop Matplotlib printing junk to the console on first load
-    sed -i "s/^.*Matplotlib is building the font cache using fc-list.*$/# Warning removed by Kaggle/g" /opt/conda/lib/python3.6/site-packages/matplotlib/font_manager.py && \
+    sed -i "s/^.*Matplotlib is building the font cache using fc-list.*$/# Warning removed by Kaggle/g" /opt/conda/lib/python3.7/site-packages/matplotlib/font_manager.py && \
     # Make matplotlib output in Jupyter notebooks display correctly
     mkdir -p /etc/ipython/ && echo "c = get_config(); c.IPKernelApp.matplotlib = 'inline'" > /etc/ipython/ipython_config.py && \
     /tmp/clean-layer.sh
@@ -532,12 +533,12 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
 
 # Add BigQuery client proxy settings
 ENV PYTHONUSERBASE "/root/.local"
-ADD patches/kaggle_gcp.py /root/.local/lib/python3.6/site-packages/kaggle_gcp.py
-ADD patches/kaggle_secrets.py /root/.local/lib/python3.6/site-packages/kaggle_secrets.py
-ADD patches/kaggle_web_client.py /root/.local/lib/python3.6/site-packages/kaggle_web_client.py
-ADD patches/kaggle_datasets.py /root/.local/lib/python3.6/site-packages/kaggle_datasets.py
-ADD patches/log.py /root/.local/lib/python3.6/site-packages/log.py
-ADD patches/sitecustomize.py /root/.local/lib/python3.6/site-packages/sitecustomize.py
+ADD patches/kaggle_gcp.py /root/.local/lib/python3.7/site-packages/kaggle_gcp.py
+ADD patches/kaggle_secrets.py /root/.local/lib/python3.7/site-packages/kaggle_secrets.py
+ADD patches/kaggle_web_client.py /root/.local/lib/python3.7/site-packages/kaggle_web_client.py
+ADD patches/kaggle_datasets.py /root/.local/lib/python3.7/site-packages/kaggle_datasets.py
+ADD patches/log.py /root/.local/lib/python3.7/site-packages/log.py
+ADD patches/sitecustomize.py /root/.local/lib/python3.7/site-packages/sitecustomize.py
 
 # TensorBoard Jupyter extension. Should be replaced with TensorBoard's provided magic once we have
 # worker tunneling support in place.
@@ -546,7 +547,7 @@ ADD patches/sitecustomize.py /root/.local/lib/python3.6/site-packages/sitecustom
 # RUN pip install jupyter_tensorboard && \
 #     jupyter serverextension enable jupyter_tensorboard && \
 #     jupyter tensorboard enable
-# ADD patches/tensorboard/notebook.py /opt/conda/lib/python3.6/site-packages/tensorboard/notebook.py
+# ADD patches/tensorboard/notebook.py /opt/conda/lib/python3.7/site-packages/tensorboard/notebook.py
 
 # Set backend for matplotlib
 ENV MPLBACKEND "agg"
