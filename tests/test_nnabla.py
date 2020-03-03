@@ -10,12 +10,9 @@ from common import gpu_test
 
 class TestNNabla(unittest.TestCase):
     def test_addition(self):
-        nd_a = np.random.random()
-        nd_b = np.random.random()
-
         # entry variables
-        a = nn.Variable.from_numpy_array(nd_a)
-        b = nn.Variable.from_numpy_array(nd_b)
+        a = nn.Variable.from_numpy_array(np.random.random())
+        b = nn.Variable.from_numpy_array(np.random.random())
 
         # add operation
         c = a + b
@@ -23,7 +20,7 @@ class TestNNabla(unittest.TestCase):
         # forward
         c.forward()
 
-        self.assertEqual(c.d, nd_a + nd_b)
+        self.assertAlmostEqual(c.d, a.d + b.d)
 
     @gpu_test
     def test_cuda_ext(self):
